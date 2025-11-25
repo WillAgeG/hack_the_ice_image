@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from 'react';
 import { DoodleButton, DoodleCard, Tape } from './DoodleComponents';
 import { GeminiCritic } from './GeminiCritic';
@@ -11,14 +10,14 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [color, setColor] = useState('#000000');
-  const [lineWidth, setLineWidth] = useState(5);
+  const [lineWidth, setLineWidth] = useState(15); 
   const [imageData, setImageData] = useState<string | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = 400; // Fixed height
+      canvas.width = 2000;
+      canvas.height = 1200;
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.fillStyle = '#ffffff';
@@ -38,10 +37,8 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
     setIsDrawing(false);
     const canvas = canvasRef.current;
     if (canvas) {
-        // Stop current path
         const ctx = canvas.getContext('2d');
         ctx?.beginPath();
-        // Save state for preview
         setImageData(canvas.toDataURL('image/png'));
     }
   };
@@ -54,14 +51,17 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
     let x, y;
 
     if ('touches' in e) {
-      x = e.touches[0].clientX - rect.left;
-      y = e.touches[0].clientY - rect.top;
+      x = (e.touches[0].clientX - rect.left) * scaleX;
+      y = (e.touches[0].clientY - rect.top) * scaleY;
     } else {
-      x = (e as React.MouseEvent).clientX - rect.left;
-      y = (e as React.MouseEvent).clientY - rect.top;
+      x = ((e as React.MouseEvent).clientX - rect.left) * scaleX;
+      y = ((e as React.MouseEvent).clientY - rect.top) * scaleY;
     }
 
     ctx.lineWidth = lineWidth;
@@ -86,10 +86,7 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
   };
 
   const handleSave = () => {
-    if (canvasRef.current && imageData) {
-      onSave(imageData);
-    } else if (canvasRef.current) {
-       // Just in case imageData isn't set but canvas exists
+    if (canvasRef.current) {
        onSave(canvasRef.current.toDataURL('image/png'));
     }
   };
@@ -103,7 +100,6 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
       </h2>
       
       <div className="w-full flex flex-col md:flex-row gap-6">
-        {/* Tools Panel */}
         <DoodleCard className="flex-none md:w-48 bg-yellow-50 flex flex-col gap-4 text-gray-900" rotate="rotate-1" borderColor="border-orange-500">
            <Tape />
            <h3 className="text-xl font-bold text-center mb-2 text-black">Инструменты</h3>
@@ -121,11 +117,11 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
            </div>
 
            <div className="mt-4">
-             <label className="block text-sm font-bold mb-1 text-black">Толщина: {lineWidth}</label>
+             <label className="block text-sm font-bold mb-1 text-black">Толщина: {Math.round(lineWidth / 3)}</label>
              <input 
                type="range" 
-               min="1" 
-               max="20" 
+               min="3" 
+               max="60" 
                value={lineWidth} 
                onChange={(e) => setLineWidth(Number(e.target.value))}
                className="w-full"
@@ -148,11 +144,10 @@ export const DrawingCanvas: React.FC<DrawingCanvasProps> = ({ onSave }) => {
            </div>
         </DoodleCard>
 
-        {/* Canvas Area */}
         <div className="flex-grow relative">
           <canvas
             ref={canvasRef}
-            className="w-full bg-white cursor-crosshair border-4 border-black shadow-[10px_10px_0px_0px_rgba(0,0,0,0.15)] rounded-sm touch-none"
+            className="w-full h-[400px] bg-white cursor-crosshair border-4 border-black shadow-[10px_10px_0px_0px_rgba(0,0,0,0.15)] rounded-sm touch-none"
             onMouseDown={startDrawing}
             onMouseUp={stopDrawing}
             onMouseOut={stopDrawing}
