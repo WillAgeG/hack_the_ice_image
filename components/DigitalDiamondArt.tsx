@@ -348,9 +348,9 @@ export const DigitalDiamondArt: React.FC = () => {
         
         <div className="mt-6 flex flex-col md:flex-row justify-between items-center px-4 pb-4 gap-4">
             <div className="text-cyan-300 font-mono text-sm">
-                > NAME: SPARKY<br/>
-                > MISSION: MAKE YOU SMILE<br/>
-                > REGION: YAKUTIA_NET
+                &gt; NAME: SPARKY<br/>
+                &gt; MISSION: MAKE YOU SMILE<br/>
+                &gt; REGION: YAKUTIA_NET
             </div>
             <DoodleButton 
                 onClick={downloadArt}
