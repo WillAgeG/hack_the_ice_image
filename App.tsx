@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { ViewState, NAV_ITEMS } from './types';
 import { DoodleCard, DoodleButton, Tape } from './components/DoodleComponents';
 import { DrawingCanvas } from './components/DrawingCanvas';
+import { DigitalDiamondArt } from './components/DigitalDiamondArt';
 
 const SAMPLE_DRAWINGS = [
   "data:image/svg+xml;charset=utf-8,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M200 50 L350 150 L200 350 L50 150 Z' fill='none' stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='150' cy='150' r='12' fill='black'/%3E%3Ccircle cx='250' cy='150' r='12' fill='black'/%3E%3Cpath d='M150 200 Q200 260 250 200' fill='none' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='350' y1='150' x2='390' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='50' y1='150' x2='10' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='130' y1='280' x2='130' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='270' y1='280' x2='270' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E",
@@ -195,6 +197,7 @@ export default function App() {
         {currentView === ViewState.HOME && <Hero onNavigate={setCurrentView} />}
         {currentView === ViewState.DRAW && <DrawingCanvas onSave={handleSaveDrawing} />}
         {currentView === ViewState.GALLERY && <Gallery drawings={drawings} />}
+        {currentView === ViewState.MAIN_ART && <DigitalDiamondArt />}
       </main>
 
       <footer className="mt-20 py-8 text-center border-t-2 border-dashed border-gray-300">

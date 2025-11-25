@@ -2,7 +2,8 @@
 export enum ViewState {
   HOME = 'HOME',
   DRAW = 'DRAW',
-  GALLERY = 'GALLERY'
+  GALLERY = 'GALLERY',
+  MAIN_ART = 'MAIN_ART'
 }
 
 export interface NavItem {
@@ -15,4 +16,5 @@ export const NAV_ITEMS: NavItem[] = [
   { label: 'Главная', view: ViewState.HOME, color: 'bg-blue-400' },
   { label: 'Рисовать!', view: ViewState.DRAW, color: 'bg-pink-400' },
   { label: 'Мои Рисунки', view: ViewState.GALLERY, color: 'bg-yellow-400' },
+  { label: 'Главный Арт', view: ViewState.MAIN_ART, color: 'bg-purple-500' },
 ];
