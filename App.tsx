@@ -5,6 +5,8 @@ import { DoodleCard, DoodleButton, Tape } from './components/DoodleComponents';
 import { DrawingCanvas } from './components/DrawingCanvas';
 import { DigitalDiamondArt } from './components/DigitalDiamondArt';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
 const SAMPLE_DRAWINGS = [
   "data:image/svg+xml;charset=utf-8,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M200 50 L350 150 L200 350 L50 150 Z' fill='none' stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='150' cy='150' r='12' fill='black'/%3E%3Ccircle cx='250' cy='150' r='12' fill='black'/%3E%3Cpath d='M150 200 Q200 260 250 200' fill='none' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='350' y1='150' x2='390' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='50' y1='150' x2='10' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='130' y1='280' x2='130' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='270' y1='280' x2='270' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E",
   "data:image/svg+xml;charset=utf-8,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='100' y='100' width='200' height='200' fill='none' stroke='%236b7280' stroke-width='8' rx='20'/%3E%3Crect x='130' y='140' width='40' height='40' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='230' y='140' width='40' height='40' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='150' y='240' width='100' height='20' fill='none' stroke='black' stroke-width='5'/%3E%3Cline x1='200' y1='100' x2='200' y2='40' stroke='black' stroke-width='8'/%3E%3Ccircle cx='200' cy='30' r='15' fill='%23ef4444'/%3E%3Cline x1='90' y1='200' x2='40' y2='250' stroke='black' stroke-width='8'/%3E%3Cline x1='310' y1='200' x2='360' y2='250' stroke='black' stroke-width='8'/%3E%3C/svg%3E",
@@ -157,18 +159,54 @@ export default function App() {
   useEffect(() => {
     const saved = localStorage.getItem('my_mascot_drawings');
     if (saved) {
-        try {
-            setDrawings(JSON.parse(saved));
-        } catch (e) {
-            console.error("Failed to load drawings", e);
-        }
+      try {
+        setDrawings(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load drawings", e);
+      }
     }
+
+    const fetchFromBackend = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/drawings`);
+        if (!response.ok) throw new Error('Failed to fetch drawings');
+
+        const payload = await response.json();
+        if (Array.isArray(payload.drawings)) {
+          const serverDrawings = payload.drawings
+            .map((item: { imageData?: string }) => item.imageData)
+            .filter((item): item is string => Boolean(item));
+
+          if (serverDrawings.length) {
+            setDrawings(serverDrawings);
+            localStorage.setItem('my_mascot_drawings', JSON.stringify(serverDrawings));
+          }
+        }
+      } catch (e) {
+        console.warn('Не удалось загрузить рисунки с бэкенда', e);
+      }
+    };
+
+    fetchFromBackend();
   }, []);
 
   const handleSaveDrawing = (data: string) => {
       const newList = [data, ...drawings];
       setDrawings(newList);
       localStorage.setItem('my_mascot_drawings', JSON.stringify(newList));
+
+      (async () => {
+        try {
+          await fetch(`${API_URL}/api/drawings`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageData: data })
+          });
+        } catch (e) {
+          console.error('Не удалось отправить рисунок на сервер', e);
+        }
+      })();
+
       setCurrentView(ViewState.GALLERY);
       window.scrollTo(0, 0);
   };
