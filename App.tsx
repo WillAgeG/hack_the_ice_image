@@ -1,14 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { ViewState, NAV_ITEMS } from './types';
 import { DoodleCard, DoodleButton, Tape } from './components/DoodleComponents';
 import { DrawingCanvas } from './components/DrawingCanvas';
 
-// Pre-made SVG drawings for inspiration
 const SAMPLE_DRAWINGS = [
-  "data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M200 50 L350 150 L200 350 L50 150 Z' fill='none' stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='150' cy='150' r='12' fill='black'/%3E%3Ccircle cx='250' cy='150' r='12' fill='black'/%3E%3Cpath d='M150 200 Q200 260 250 200' fill='none' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='350' y1='150' x2='390' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='50' y1='150' x2='10' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='130' y1='280' x2='130' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='270' y1='280' x2='270' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E",
-  "data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='100' y='100' width='200' height='200' fill='none' stroke='%236b7280' stroke-width='8' rx='20'/%3E%3Crect x='130' y='140' width='40' height='40' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='230' y='140' width='40' height='40' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='150' y='240' width='100' height='20' fill='none' stroke='black' stroke-width='5'/%3E%3Cline x1='200' y1='100' x2='200' y2='40' stroke='black' stroke-width='8'/%3E%3Ccircle cx='200' cy='30' r='15' fill='%23ef4444'/%3E%3Cline x1='90' y1='200' x2='40' y2='250' stroke='black' stroke-width='8'/%3E%3Cline x1='310' y1='200' x2='360' y2='250' stroke='black' stroke-width='8'/%3E%3C/svg%3E",
-  "data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='200' cy='200' rx='110' ry='90' fill='none' stroke='%2378350f' stroke-width='8'/%3E%3Cpath d='M100 220 Q60 280 80 320' fill='none' stroke='%23fef3c7' stroke-width='10'/%3E%3Cpath d='M300 220 Q340 280 320 320' fill='none' stroke='%23fef3c7' stroke-width='10'/%3E%3Ccircle cx='160' cy='180' r='8' fill='black'/%3E%3Ccircle cx='240' cy='180' r='8' fill='black'/%3E%3Cpath d='M200 220 Q200 320 260 300' fill='none' stroke='%2378350f' stroke-width='8'/%3E%3Cline x1='160' y1='290' x2='160' y2='370' stroke='%2378350f' stroke-width='8'/%3E%3Cline x1='240' y1='290' x2='240' y2='370' stroke='%2378350f' stroke-width='8'/%3E%3C/svg%3E"
+  "data:image/svg+xml;charset=utf-8,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M200 50 L350 150 L200 350 L50 150 Z' fill='none' stroke='%233b82f6' stroke-width='8' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='150' cy='150' r='12' fill='black'/%3E%3Ccircle cx='250' cy='150' r='12' fill='black'/%3E%3Cpath d='M150 200 Q200 260 250 200' fill='none' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='350' y1='150' x2='390' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='50' y1='150' x2='10' y2='100' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='130' y1='280' x2='130' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3Cline x1='270' y1='280' x2='270' y2='380' stroke='black' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E",
+  "data:image/svg+xml;charset=utf-8,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='100' y='100' width='200' height='200' fill='none' stroke='%236b7280' stroke-width='8' rx='20'/%3E%3Crect x='130' y='140' width='40' height='40' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='230' y='140' width='40' height='40' fill='none' stroke='black' stroke-width='5'/%3E%3Crect x='150' y='240' width='100' height='20' fill='none' stroke='black' stroke-width='5'/%3E%3Cline x1='200' y1='100' x2='200' y2='40' stroke='black' stroke-width='8'/%3E%3Ccircle cx='200' cy='30' r='15' fill='%23ef4444'/%3E%3Cline x1='90' y1='200' x2='40' y2='250' stroke='black' stroke-width='8'/%3E%3Cline x1='310' y1='200' x2='360' y2='250' stroke='black' stroke-width='8'/%3E%3C/svg%3E",
+  "data:image/svg+xml;charset=utf-8,%3Csvg width='400' height='400' viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cellipse cx='200' cy='200' rx='110' ry='90' fill='none' stroke='%2378350f' stroke-width='8'/%3E%3Cpath d='M100 220 Q60 280 80 320' fill='none' stroke='%23fef3c7' stroke-width='10'/%3E%3Cpath d='M300 220 Q340 280 320 320' fill='none' stroke='%23fef3c7' stroke-width='10'/%3E%3Ccircle cx='160' cy='180' r='8' fill='black'/%3E%3Ccircle cx='240' cy='180' r='8' fill='black'/%3E%3Cpath d='M200 220 Q200 320 260 300' fill='none' stroke='%2378350f' stroke-width='8'/%3E%3Cline x1='160' y1='290' x2='160' y2='370' stroke='%2378350f' stroke-width='8'/%3E%3Cline x1='240' y1='290' x2='240' y2='370' stroke='%2378350f' stroke-width='8'/%3E%3C/svg%3E"
 ];
 
 const Hero = ({ onNavigate }: { onNavigate: (v: ViewState) => void }) => (
@@ -25,9 +23,9 @@ const Hero = ({ onNavigate }: { onNavigate: (v: ViewState) => void }) => (
     <DoodleCard className="max-w-3xl bg-white mt-8" rotate="rotate-1" borderColor="border-blue-500">
       <Tape className="-top-5" />
       <p className="text-xl md:text-2xl text-center leading-relaxed text-gray-800">
-        Привет! Технопарк «Якутия» ищет <b>ГЕРОЯ</b> для форума! <br/>
-        Это твой шанс создать лицо цифрового будущего. <br/>
-        Придумай персонажа, который любит технологии, традиции и инновации!
+        Всем привет! 👋 <br/>
+        Это моя конкурсная страница. Я участвую в битве за лучшего маскота для форума «Цифровой Алмаз»! <br/>
+        Здесь я собираю свои лучшие идеи. Технологии + Традиции = Мой Маскот! 💎✨
       </p>
       <div className="mt-8 flex justify-center">
         <DoodleButton 
@@ -62,18 +60,53 @@ const Hero = ({ onNavigate }: { onNavigate: (v: ViewState) => void }) => (
     </div>
 
     <DoodleCard className="bg-white max-w-2xl mt-8" rotate="rotate-1" borderColor="border-gray-400">
-        <h3 className="text-xl font-bold text-center mb-2 text-gray-900">📜 Как участвовать?</h3>
-        <p className="text-center text-lg text-gray-800">1. Нарисуй маскота (жми розовую кнопку!).</p>
-        <p className="text-center text-lg text-gray-800">2. Сохрани рисунок.</p>
-        <p className="text-center text-lg text-gray-800">3. Отправь на <b>technopark_14@mail.ru</b></p>
-        <p className="text-center text-sm text-gray-500 mt-4">Итоги 29 ноября 2025 • Якутск</p>
+        <h3 className="text-xl font-bold text-center mb-2 text-gray-900">🚀 Мой План Победы!</h3>
+        <p className="text-center text-lg text-gray-800">1. Придумать самого крутого цифрового персонажа.</p>
+        <p className="text-center text-lg text-gray-800">2. Нарисовать его прямо здесь и сейчас.</p>
+        <p className="text-center text-lg text-gray-800">3. Поразить жюри и забрать главный приз!</p>
+        <p className="text-center text-sm text-gray-500 mt-4">Удачи мне! (И всем остальным тоже немножко 😉)</p>
     </DoodleCard>
   </div>
 );
 
 const Gallery = ({ drawings }: { drawings: string[] }) => {
-  // Combine user drawings with sample drawings for a full gallery
   const allMasterpieces = [...drawings, ...SAMPLE_DRAWINGS];
+
+  const downloadImage = (src: string, index: number) => {
+    const img = new Image();
+    
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const targetSize = 2048; 
+      canvas.width = targetSize;
+      canvas.height = targetSize;
+      
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const hRatio = canvas.width / img.width;
+        const vRatio = canvas.height / img.height;
+        const ratio = Math.min(hRatio, vRatio);
+        const centerShift_x = (canvas.width - img.width * ratio) / 2;
+        const centerShift_y = (canvas.height - img.height * ratio) / 2;  
+        
+        ctx.drawImage(img, 0, 0, img.width, img.height, centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
+        
+        const jpgUrl = canvas.toDataURL('image/jpeg', 0.95);
+        
+        const link = document.createElement('a');
+        link.href = jpgUrl;
+        link.download = `Moj_Shedevr_${index}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    };
+    
+    img.src = src;
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-4 py-10 text-gray-900">
@@ -84,19 +117,28 @@ const Gallery = ({ drawings }: { drawings: string[] }) => {
           <div className="absolute top-0 right-1/4 hidden lg:block text-5xl animate-bounce">🎨</div>
       </div>
       
-      {/* Combined Drawings Section */}
       <div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
               {allMasterpieces.map((src, idx) => (
               <div key={idx} className="relative group">
                   <DoodleCard className="bg-white p-4" rotate={idx % 2 === 0 ? 'rotate-1' : '-rotate-2'}>
                       <Tape className="-top-3 left-1/2 w-24" />
-                      <div className="aspect-square w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-white flex items-center justify-center relative">
+                      <div className="aspect-square w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-white flex items-center justify-center relative group-hover:bg-gray-50 transition-colors">
                           <img src={src} alt={`Рисунок ${idx + 1}`} className="max-w-full max-h-full object-contain" />
                       </div>
-                      <p className="text-center mt-4 hand-font text-gray-500 font-bold">
-                        {idx < drawings.length ? `Твой шедевр #${drawings.length - idx}` : `Идея для маскота #${idx - drawings.length + 1}`}
-                      </p>
+                      
+                      <div className="flex items-center justify-between mt-4">
+                          <p className="hand-font text-gray-600 font-bold text-lg">
+                            Шедевр #{allMasterpieces.length - idx}
+                          </p>
+                          <button 
+                             onClick={() => downloadImage(src, allMasterpieces.length - idx)}
+                             className="text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded-full border border-blue-300 font-bold hand-font transition-colors"
+                             title="Скачать как JPG"
+                          >
+                             ⬇ Скачать (JPG)
+                          </button>
+                      </div>
                   </DoodleCard>
               </div>
               ))}
@@ -131,7 +173,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen pb-20 overflow-x-hidden bg-[#fff9e6] text-gray-900">
-      {/* Navigation */}
       <nav className="p-4 flex flex-wrap justify-center gap-4 sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b-4 border-black/10 shadow-sm">
         {NAV_ITEMS.map((item) => (
           <button
@@ -150,17 +191,18 @@ export default function App() {
         ))}
       </nav>
 
-      {/* Content */}
       <main className="container mx-auto">
         {currentView === ViewState.HOME && <Hero onNavigate={setCurrentView} />}
         {currentView === ViewState.DRAW && <DrawingCanvas onSave={handleSaveDrawing} />}
         {currentView === ViewState.GALLERY && <Gallery drawings={drawings} />}
       </main>
 
-      {/* Footer */}
       <footer className="mt-20 py-8 text-center border-t-2 border-dashed border-gray-300">
         <p className="hand-font text-gray-500 text-lg">
           📍 Якутск, 2025 | Цифровой Алмаз
+        </p>
+        <p className="hand-font text-gray-400 text-base mt-2">
+          Проект студента Шараборина Алексея
         </p>
         <div className="flex justify-center gap-6 mt-4 font-bold text-blue-500">
            <a href="https://t.me/digitaldiamond22" target="_blank" rel="noreferrer" className="hover:text-blue-700 hover:underline">Telegram</a>
